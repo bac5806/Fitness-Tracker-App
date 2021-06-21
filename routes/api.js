@@ -43,13 +43,20 @@ router.get('/api/workouts/range', async (req, res) => {
     }
 });
 
-router.put('/api/workouts/:id', async (req, res) => {
-  try {
-    const workoutID = await Workout.findByIdAndUpdate(req.params.id);
-    res.json(workoutID);  
-  } catch (err) {
-    res.status(400).json(err); 
-  }
+router.put("/api/workouts/:id", ({ body, params }, res) => {
+  console.log("check!", body, params);
+  
+  Workout.findByIdAndUpdate(
+    { _id: params.id },
+    { $push: { exercises: body } },
+    { new: true }
+  )
+    .then(dbWorkout => {
+      res.json(dbWorkout);
+    })
+    .catch((err) => {
+      res.status(400).res.json(err);
+    });
 });
 
 module.exports = router;
